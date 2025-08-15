@@ -15,7 +15,7 @@
             <div class="header-content">
                 <div class="logo">
                     <i class="fas fa-thermometer-half"></i>
-                    <h1>Control Climático ESP32</h1>
+                    <h1>Dashboard y OTA</h1>
                 </div>
                 <div class="connection-status" id="connectionStatus">
                     <i class="fas fa-wifi"></i>
@@ -158,33 +158,7 @@
                 </div>
             </section>
 
-            <!-- Charts Section -->
-            <section class="charts-section">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h2><i class="fas fa-chart-line"></i> Historial de Temperatura</h2>
-                        <!-- <div class="chart-controls">
-                            <button class="btn-chart active" data-period="1h">1H</button>
-                            <button class="btn-chart" data-period="6h">6H</button>
-                            <button class="btn-chart" data-period="24h">24H</button>
-                        </div> -->
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="temperatureChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h2><i class="fas fa-chart-area"></i> Historial de Humedad</h2>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="humidityChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Statistics Section -->
+                        <!-- Statistics Section -->
             <section class="stats-section">
                 <h2><i class="fas fa-chart-bar"></i> Estadísticas</h2>
                 <div class="stats-grid">
@@ -229,6 +203,36 @@
                     </div>
                 </div>
             </section>
+
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h2><i class="fas fa-chart-line"></i> Historial de Temperatura</h2>
+                            <!-- <div class="chart-controls">
+                                <button class="btn-chart active" data-period="1h">1H</button>
+                                <button class="btn-chart" data-period="6h">6H</button>
+                                <button class="btn-chart" data-period="24h">24H</button>
+                            </div> -->
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h2><i class="fas fa-chart-area"></i> Historial de Humedad</h2>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="humidityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
 
             <!-- OTA Section -->
             <section class="ota-section">
@@ -321,14 +325,8 @@
                                     <i class="fas fa-search"></i>
                                     Verificar Actualizaciones
                                 </button>
-                                <button class="ota-btn update-btn" id="forceUpdateBtn">
-                                    <i class="fas fa-download"></i>
-                                    Forzar Actualización
-                                </button>
-                                <button class="ota-btn rollback-btn" id="rollbackBtn">
-                                    <i class="fas fa-undo"></i>
-                                    Rollback
-                                </button>
+
+
                             </div>
                             <div class="ota-progress" id="otaProgress" style="display: none;">
                                 <div class="progress-bar">
@@ -339,26 +337,7 @@
                         </div>
                     </div>
 
-                    <!-- Dispositivos Conectados -->
-                    <div class="ota-card devices-card">
-                        <div class="ota-header">
-                            <div class="ota-icon">
-                                <i class="fas fa-microchip"></i>
-                            </div>
-                            <h4>Dispositivos Conectados</h4>
-                        </div>
-                        <div class="ota-content">
-                            <div class="device-list">
-                                <div class="device-item">
-                                    <div class="device-info">
-                                        <div class="device-name">ESP32-2020171026</div>
-                                        <div class="device-status online">En línea</div>
-                                    </div>
-                                    <div class="device-version">v1.0.0</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
 
 
                 </div>

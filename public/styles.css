@@ -53,9 +53,9 @@ body {
     sans-serif;
   background: radial-gradient(
     ellipse at top,
-    #1a1a2e 0%,
-    #16213e 50%,
-    #0f172a 100%
+    #0a0a0a 0%,
+    #1a1a1a 40%,
+    #2d2d2d 100%
   );
   color: var(--text-primary);
   line-height: 1.6;
@@ -82,8 +82,14 @@ body {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  position: relative;
+}
+
+.connection-status {
+  position: absolute;
+  right: 0;
 }
 
 .logo {
@@ -701,12 +707,18 @@ body {
   margin-bottom: 3rem;
 }
 
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+}
+
 .chart-container {
   background: var(--bg-card);
   border: 2px solid var(--border-color);
   border-radius: 0;
   padding: 0;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   transition: var(--transition);
   position: relative;
@@ -1067,6 +1079,11 @@ body {
     align-items: flex-start;
   }
 
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
   .chart-wrapper {
     height: 250px;
   }
@@ -1228,19 +1245,11 @@ body {
 
 .ota-header h4 {
   margin: 0;
-  color: var(--text-primary);
+  color: #000000;
   font-size: 1.3rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--accent-color)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .ota-content {
