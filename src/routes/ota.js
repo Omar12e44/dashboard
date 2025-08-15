@@ -243,13 +243,14 @@ router.delete("/firmware", (req, res) => {
   }
 });
 
-app.get("/api/ota/firmware", (req, res) => {
+// Endpoint adicional para firmware con lógica avanzada
+router.get("/api/ota/firmware", (req, res) => {
   const fs = require("fs");
   const path = require("path");
   const crypto = require("crypto");
 
   try {
-    const uploadsPath = path.join(__dirname, "../uploads");
+    const uploadsPath = path.join(__dirname, "../../uploads");
 
     // Buscar el archivo .bin más reciente
     const files = fs.readdirSync(uploadsPath);
@@ -337,41 +338,14 @@ app.get("/api/ota/firmware", (req, res) => {
   }
 });
 
-// Función mejorada para extraer versión
-function extractVersionFromFilename(filename) {
-  console.log(`🔍 Extrayendo versión de: ${filename}`);
-
-  const patterns = [
-    /v?(\d+\.\d+(?:\.\d+)?)/i, // v1.0, v2.1.0, 1.0, 2.1.0
-    /version[_-]?(\d+\.\d+)/i, // version_1.0, version-2.1
-    /firmware[_-]?(\d+\.\d+)/i, // firmware_1.0, firmware-2.1
-    /climate[_-]?(\d+\.\d+)/i, // climate_1.0, climate-2.1
-    /esp32[_-]?(\d+\.\d+)/i, // esp32_1.0, esp32-2.1
-  ];
-
-  for (const pattern of patterns) {
-    const match = filename.match(pattern);
-    if (match) {
-      console.log(`✅ Versión encontrada: ${match[1]} (patrón: ${pattern})`);
-      return match[1];
-    }
-  }
-
-  // Si no encuentra patrón, usar timestamp como versión
-  const timestamp = Math.floor(Date.now() / 1000);
-  const fallbackVersion = `1.${timestamp.toString().slice(-3)}`;
-  console.log(`⚠️ No se encontró versión, usando fallback: ${fallbackVersion}`);
-  return fallbackVersion;
-}
-
-// Endpoint para verificar versión (HEAD request)
-app.head("/api/ota/firmware", (req, res) => {
+// Endpoint adicional para verificar versión (HEAD request)
+router.head("/api/ota/firmware", (req, res) => {
   const fs = require("fs");
   const path = require("path");
   const crypto = require("crypto");
 
   try {
-    const uploadsPath = path.join(__dirname, "../uploads");
+    const uploadsPath = path.join(__dirname, "../../uploads");
     const files = fs.readdirSync(uploadsPath);
     const binFiles = files.filter((file) => file.endsWith(".bin"));
 
@@ -410,5 +384,32 @@ app.head("/api/ota/firmware", (req, res) => {
     res.status(500).end();
   }
 });
+
+// Función mejorada para extraer versión
+function extractVersionFromFilename(filename) {
+  console.log(`🔍 Extrayendo versión de: ${filename}`);
+
+  const patterns = [
+    /v?(\d+\.\d+(?:\.\d+)?)/i, // v1.0, v2.1.0, 1.0, 2.1.0
+    /version[_-]?(\d+\.\d+)/i, // version_1.0, version-2.1
+    /firmware[_-]?(\d+\.\d+)/i, // firmware_1.0, firmware-2.1
+    /climate[_-]?(\d+\.\d+)/i, // climate_1.0, climate-2.1
+    /esp32[_-]?(\d+\.\d+)/i, // esp32_1.0, esp32-2.1
+  ];
+
+  for (const pattern of patterns) {
+    const match = filename.match(pattern);
+    if (match) {
+      console.log(`✅ Versión encontrada: ${match[1]} (patrón: ${pattern})`);
+      return match[1];
+    }
+  }
+
+  // Si no encuentra patrón, usar timestamp como versión
+  const timestamp = Math.floor(Date.now() / 1000);
+  const fallbackVersion = `1.${timestamp.toString().slice(-3)}`;
+  console.log(`⚠️ No se encontró versión, usando fallback: ${fallbackVersion}`);
+  return fallbackVersion;
+}
 
 module.exports = router;
