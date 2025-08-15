@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Control Climático ESP32</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-thermometer-half"></i>
+                    <h1>Control Climático ESP32</h1>
+                </div>
+                <div class="connection-status" id="connectionStatus">
+                    <i class="fas fa-wifi"></i>
+                    <span>Conectando...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando datos del sensor...</p>
+                </div>
+            </div>
+
+            <!-- Sensor Data Cards -->
+            <section class="sensor-cards">
+                <div class="card temperature-card">
+                    <div class="card-header">
+                        <div class="card-icon temperature-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="card-title">
+                            <h3>Temperatura</h3>
+                            <p>Sensor DHT11</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="sensor-value">
+                            <span class="value" id="temperatureValue">--</span>
+                            <span class="unit">°C</span>
+                        </div>
+                        <div class="sensor-trend" id="temperatureTrend">
+                            <i class="fas fa-minus"></i>
+                            <span>Sin datos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card humidity-card">
+                    <div class="card-header">
+                        <div class="card-icon humidity-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="card-title">
+                            <h3>Humedad</h3>
+                            <p>Sensor DHT11</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="sensor-value">
+                            <span class="value" id="humidityValue">--</span>
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="sensor-trend" id="humidityTrend">
+                            <i class="fas fa-minus"></i>
+                            <span>Sin datos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card status-card">
+                    <div class="card-header">
+                        <div class="card-icon status-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="card-title">
+                            <h3>Estado del Sistema</h3>
+                            <p id="lastUpdate">Última actualización: --</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="system-status">
+                            <span class="status-badge" id="systemStatus">IDLE</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEDs Section -->
+            <section class="leds-section">
+                <h2><i class="fas fa-lightbulb"></i> Estado de LEDs Indicadores</h2>
+                <div class="leds-grid">
+                    <div class="led-card led-amarillo-card">
+                        <div class="led-header">
+                            <div class="led-icon">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <div class="led-info">
+                                <h4>LED Amarillo</h4>
+                                <div class="led-status" id="ledAmarilloStatus">
+                                    <span class="status-text">Apagado</span>
+                                    <div class="status-indicator">
+                                        <div class="led-light" id="ledAmarilloLight"></div>
+                                    </div>
+                                </div>
+                                <p class="led-description">Temperatura Normal (IDLE)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="led-card led-verde-card">
+                        <div class="led-header">
+                            <div class="led-icon">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <div class="led-info">
+                                <h4>LED Verde</h4>
+                                <div class="led-status" id="ledVerdeStatus">
+                                    <span class="status-text">Apagado</span>
+                                    <div class="status-indicator">
+                                        <div class="led-light" id="ledVerdeLight"></div>
+                                    </div>
+                                </div>
+                                <p class="led-description">Refrigeración (COOLING)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="led-card led-rojo-card">
+                        <div class="led-header">
+                            <div class="led-icon">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <div class="led-info">
+                                <h4>LED Rojo</h4>
+                                <div class="led-status" id="ledRojoStatus">
+                                    <span class="status-text">Apagado</span>
+                                    <div class="status-indicator">
+                                        <div class="led-light" id="ledRojoLight"></div>
+                                    </div>
+                                </div>
+                                <p class="led-description">Calefacción (HEATING)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2><i class="fas fa-chart-line"></i> Historial de Temperatura</h2>
+                        <!-- <div class="chart-controls">
+                            <button class="btn-chart active" data-period="1h">1H</button>
+                            <button class="btn-chart" data-period="6h">6H</button>
+                            <button class="btn-chart" data-period="24h">24H</button>
+                        </div> -->
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2><i class="fas fa-chart-area"></i> Historial de Humedad</h2>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="humidityChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section class="stats-section">
+                <h2><i class="fas fa-chart-bar"></i> Estadísticas</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-temperature-low"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="minTemp">--</div>
+                            <div class="stat-label">Temp. Mínima</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-temperature-high"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="maxTemp">--</div>
+                            <div class="stat-label">Temp. Máxima</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="avgTemp">--</div>
+                            <div class="stat-label">Temp. Promedio</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="avgHumidity">--</div>
+                            <div class="stat-label">Humedad Promedio</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- OTA Section -->
+            <section class="ota-section">
+                <h2><i class="fas fa-download"></i> Gestión de Actualizaciones OTA</h2>
+                <div class="ota-grid">
+                    <!-- Información de Versiones -->
+                    <div class="ota-card version-card">
+                        <div class="ota-header">
+                            <div class="ota-icon">
+                                <i class="fas fa-code-branch"></i>
+                            </div>
+                            <h4>Información de Versiones</h4>
+                        </div>
+                        <div class="ota-content">
+                            <div class="version-info">
+                                <div class="version-item">
+                                    <span class="version-label">Versión Actual:</span>
+                                    <span class="version-value current" id="currentVersion">1.0.0</span>
+                                </div>
+                                <div class="version-item">
+                                    <span class="version-label">Versión Disponible:</span>
+                                    <span class="version-value available" id="availableVersion">1.1.0</span>
+                                </div>
+                                <div class="version-item">
+                                    <span class="version-label">Estado:</span>
+                                    <span class="update-status" id="updateStatus">Actualización disponible</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carga de Firmware -->
+                    <div class="ota-card upload-card">
+                        <div class="ota-header">
+                            <div class="ota-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <h4>Cargar Nuevo Firmware</h4>
+                        </div>
+                        <div class="ota-content">
+                            <div class="upload-section">
+                                <div class="file-upload-area" id="fileUploadArea">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <p><strong>Arrastra un archivo .bin aquí</strong></p>
+                                        <p>o haz clic para seleccionar</p>
+                                    </div>
+                                    <input type="file" id="firmwareFile" accept=".bin" style="display: none;">
+                                </div>
+                                <div class="file-info" id="fileInfo" style="display: none;">
+                                    <div class="file-details">
+                                        <i class="fas fa-file-code"></i>
+                                        <span class="file-name" id="fileName"></span>
+                                        <span class="file-size" id="fileSize"></span>
+                                    </div>
+                                    <button class="remove-file-btn" id="removeFileBtn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="upload-controls">
+                                    <input type="text" id="firmwareVersion" placeholder="Versión (ej: 1.1.0)" class="version-input">
+                                    <button class="upload-btn" id="uploadBtn" disabled>
+                                        <i class="fas fa-upload"></i>
+                                        Subir Firmware
+                                    </button>
+                                </div>
+                                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="uploadProgressFill"></div>
+                                    </div>
+                                    <div class="progress-text" id="uploadProgressText">Subiendo firmware...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controles OTA -->
+                    <div class="ota-card controls-card">
+                        <div class="ota-header">
+                            <div class="ota-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <h4>Controles de Actualización</h4>
+                        </div>
+                        <div class="ota-content">
+                            <div class="ota-buttons">
+                                <button class="ota-btn check-btn" id="checkUpdateBtn">
+                                    <i class="fas fa-search"></i>
+                                    Verificar Actualizaciones
+                                </button>
+                                <button class="ota-btn update-btn" id="forceUpdateBtn">
+                                    <i class="fas fa-download"></i>
+                                    Forzar Actualización
+                                </button>
+                                <button class="ota-btn rollback-btn" id="rollbackBtn">
+                                    <i class="fas fa-undo"></i>
+                                    Rollback
+                                </button>
+                            </div>
+                            <div class="ota-progress" id="otaProgress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+                                <div class="progress-text" id="progressText">Descargando firmware...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispositivos Conectados -->
+                    <div class="ota-card devices-card">
+                        <div class="ota-header">
+                            <div class="ota-icon">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <h4>Dispositivos Conectados</h4>
+                        </div>
+                        <div class="ota-content">
+                            <div class="device-list">
+                                <div class="device-item">
+                                    <div class="device-info">
+                                        <div class="device-name">ESP32-2020171026</div>
+                                        <div class="device-status online">En línea</div>
+                                    </div>
+                                    <div class="device-version">v1.0.0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+
+
+    <script src="script.js"></script>
+</body>
+</html>
+
